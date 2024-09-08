@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('checkout branch'){
             steps {
-                echo 'Checking out the code... ${APP_ENV}'
+                echo 'Checking out the code... ${params.APP_ENV}'
                 // Replace with your repository URL and credentials ID
                 git branch: 'main', 
                     url: 'https://github.com/Rohit-kr-17/1-test-integration.git', 
