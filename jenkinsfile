@@ -1,5 +1,4 @@
 pipeline {
-    
     parameters {
         string(name: 'APP_ENV', defaultValue: 'dev', description: 'Application Environment (dev/staging/prod)')
         booleanParam(name: 'RUN_TESTS', defaultValue: true, description: 'Should tests be run?')
@@ -7,46 +6,52 @@ pipeline {
         password(name: 'DB_PASSWORD', description: 'Database Password')
     }
     agent any
-    
+
     stages {
-        stage('checkout branch'){
+        stage('Checkout Branch') {
             steps {
-                echo 'Checking out the code... ${params.APP_ENV}'
+                script {
+                    echo "Checking out the code for environment: ${params.APP_ENV}"
+                }
                 // Replace with your repository URL and credentials ID
                 git branch: 'main', 
                     url: 'https://github.com/Rohit-kr-17/1-test-integration.git', 
                     credentialsId: 'git-credentials'
             }
         }
+
         stage('Build') {
             steps {
-                echo 'Building...'
-                // Add build commands here, e.g., compile, package, etc.
+                echo "Building for environment: ${params.APP_ENV}"
                 sh 'echo "Build step running..."'
             }
         }
-        
+
         stage('Test') {
+            when {
+                expression { return params.RUN_TESTS }
+            }
             steps {
-                echo 'Testing...'
-                // Add test commands here, e.g., unit tests, integration tests, etc.
+                echo 'Running tests...'
                 sh 'echo "Test step running..."'
             }
         }
-        
+
         stage('Deploy') {
             steps {
-                echo 'Deploying...'
-                // Add deploy commands here, e.g., deploy to server, cloud, etc.
-                sh 'echo "Deploy step running..."'
+                echo "Deploying to: ${params.DEPLOY_ENV}"
+                sh """
+                echo "Deploying with the following credentials:"
+                echo "Environment: ${params.APP_ENV}"
+                echo "Deploy Environment: ${params.DEPLOY_ENV}"
+                """
             }
         }
     }
-    
+
     post {
         always {
             echo 'Cleaning up...'
-            // Add cleanup commands here
             sh 'echo "Cleanup step running..."'
         }
         success {
